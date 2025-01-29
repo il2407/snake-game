@@ -15,6 +15,7 @@ let level = 1;
 let score = 11;
 let maxScorePerLevel = 12;
 let totalLevels = 2;
+let videoWinPlaying = false;
 let collectedItems = []; // List of eaten items
 let snakeHeadImage, backgroundImage, winImage;
 let ghostImages = [];
@@ -83,7 +84,7 @@ function preload() {
 
 
 function setup() {
-    createCanvas(width, height);
+    createCanvas(window.innerWidth, window.innerHeight);
     frameRate(30);
 
     document.addEventListener("touchstart", (event) => {
@@ -214,28 +215,37 @@ function drawMenu() {
 function drawWinScreen() {
     background(0);
     textAlign(CENTER, CENTER);
-    textSize(width * 0.07);
     fill(255);
-    text("You survived 2 years!", width / 2, height * 0.2);
 
-  if (!videoWinPlaying) {
-    videoWin.position(width * 0.1, height * 0.3);
-    videoWin.size(width * 0.8, height * 0.4);
-    videoWin.show();
-    videoWin.play();         // <-- Only called once
-    videoWinPlaying = true;
-  }
-    // Add play button for mobile users
+    // === 1) Headline - Same as Level 1 End Screen ===
+    textSize(width * 0.07);
+    text(`You survived 2 years!`, width / 2, height * 0.2);
+
+    // === 2) Centered Video - Same as Level 1 End Screen ===
+    let vidWidth = width * 0.8;  // 80% of screen width
+    let vidHeight = vidWidth * 9 / 16;  // Maintain 16:9 aspect ratio
+    let vidX = (width - vidWidth) / 2;
+    let vidY = height * 0.3;  // Position below title
+
+    if (!videoWinPlaying) {
+        videoWin.position(vidX, vidY);
+        videoWin.size(vidWidth, vidHeight);
+        videoWin.show();
+        videoWin.play();
+        videoWinPlaying = true;
+    }
+
+    // === 3) Centered Continue Button - Same as Level 1 End Screen ===
     let btnWidth = width * 0.6;
     let btnHeight = height * 0.08;
-    let btnX = width / 2 - btnWidth / 2;
-    let btnY = height * 0.5;
+    let btnX = (width - btnWidth) / 2;
+    let btnY = height * 0.75;  // Same position as Level 1 End Screen
 
     fill(0, 255, 0);
     rect(btnX, btnY, btnWidth, btnHeight, 15);
     fill(0);
     textSize(width * 0.05);
-    text("Play Video", width / 2, btnY + btnHeight / 2);
+    text("Continue", width / 2, btnY + btnHeight / 2);
 }
 
 
