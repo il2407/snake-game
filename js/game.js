@@ -1,6 +1,4 @@
 let cellSize = 40;
-let width = 400;
-let height = 700;
 let snake = [];
 let snakeDir = "RIGHT";
 let touchStartX = 0;
@@ -21,6 +19,9 @@ let snakeHeadImage, backgroundImage, winImage;
 let ghostImages = [];
 let eatSounds = [];
 let eatenFoodEffects = []; // מאגר לאוכל שנאכל ואנימציותיו
+let width = window.innerWidth * 0.9; // 90% מרוחב המסך
+let height = window.innerHeight * 0.9; // 90% מגובה המסך
+
 
 
 function preload() {
@@ -128,46 +129,42 @@ function draw() {
 }
 
 function drawMenu() {
-
-    let gradientColor = lerpColor(color(15, 23, 42), color(22, 30, 58), sin(frameCount * 0.01));
-    background(gradientColor);
-
-    background(15, 23, 42); // רקע כהה אלגנטי
+    background(15, 23, 42);
     textAlign(CENTER, CENTER);
-    textSize(24);
+
+    textSize(width * 0.07);
     fill(255);
-    text("YOU:", width / 2, height / 6);
+    text("YOU:", width / 2, height * 0.15);
+    image(snakeHeadImage, width / 2 - 40, height * 0.18, 80, 80);
 
-    // הצגת תמונת ראש הנחש
-    image(snakeHeadImage, width / 2 - 20, height / 6 + 30, 40, 40);
+    text("FOOD:", width / 2, height * 0.3);
 
-    // טקסט "FOOD:"
-    text("FOOD:", width / 2, height / 3);
-
-    // הצגת תמונות האוכל (מסודרות בשורות)
-    let startY = height / 3 + 30;
+    let startY = height * 0.33;
     let cols = 4;
-    let spacing = 60;
+    let spacing = width * 0.18;
 
     for (let i = 0; i < ghostImages.length; i++) {
         let x = (i % cols) * spacing + (width / 2 - ((cols - 1) * spacing) / 2);
         let y = startY + floor(i / cols) * spacing;
-        image(ghostImages[i], x, y, 40, 40);
+        image(ghostImages[i], x, y, 70, 70);
     }
 
     // כפתור "SURVIVE"
+    let btnWidth = width * 0.6;
+    let btnHeight = height * 0.08;
+    let btnX = width / 2 - btnWidth / 2;
+
     fill(0, 255, 153);
-    rect(width / 2 - 80, height - 150, 160, 50, 10);
+    rect(btnX, height * 0.75, btnWidth, btnHeight, 15);
     fill(0);
-    textSize(20);
-    text("SURVIVE", width / 2, height - 130);
+    textSize(width * 0.05);
+    text("SURVIVE", width / 2, height * 0.75 + btnHeight / 2);
 
     // כפתור "EXIT"
     fill(255, 77, 77);
-    rect(width / 2 - 80, height - 80, 160, 50, 10);
+    rect(btnX, height * 0.85, btnWidth, btnHeight, 15);
     fill(0);
-    textSize(20);
-    text("EXIT", width / 2, height - 60);
+    text("EXIT", width / 2, height * 0.85 + btnHeight / 2);
 }
 
 
@@ -201,30 +198,45 @@ function drawWinScreen() {
 function drawLevelTransition() {
     background(0);
     textAlign(CENTER, CENTER);
-    textSize(32);
+
+    // הצגת הודעת מעבר שלב
     fill(255);
-    text("You survived a year in a relationship!", width / 2, height / 2 - 20);
+    textSize(width * 0.07); // גודל פונט מותאם
+    text(`You survived ${level} year!`, width / 2, height * 0.4);
+
+    // כפתור "Continue"
+    let btnWidth = width * 0.6;
+    let btnHeight = height * 0.08;
+    let btnX = width / 2 - btnWidth / 2;
+    let btnY = height * 0.55;
 
     fill(0, 255, 0);
-    rect(width / 2 - 60, height / 2 + 30, 120, 40);
+    rect(btnX, btnY, btnWidth, btnHeight, 15);
+
     fill(0);
-    textSize(20);
-    text("Continue to Level 2", width / 2, height / 2 + 50);
+    textSize(width * 0.05);
+    text("Continue to Year 2", width / 2, btnY + btnHeight / 2);
 }
 
 function drawGameOver() {
     background(30);
     textAlign(CENTER, CENTER);
-    textSize(32);
-    fill(255);
-    text("Game Over!", width / 2, height / 2 - 20);
 
-    // כפתור Restart
+    fill(255);
+    textSize(width * 0.07);
+    text("Game Over!", width / 2, height * 0.4);
+
+    let btnWidth = width * 0.5;
+    let btnHeight = height * 0.08;
+    let btnX = width / 2 - btnWidth / 2;
+    let btnY = height * 0.55;
+
     fill(0, 255, 0);
-    rect(width / 2 - 60, height / 2 + 20, 120, 40);
+    rect(btnX, btnY, btnWidth, btnHeight, 15);
+
     fill(0);
-    textSize(20);
-    text("Restart", width / 2, height / 2 + 40);
+    textSize(width * 0.05);
+    text("Restart", width / 2, btnY + btnHeight / 2);
 }
 
 
@@ -249,14 +261,13 @@ function moveSnake() {
         score++;
         collectedItems.push(ghostImage);
 
-        // הוספת האוכל שנאכל לאנימציה
-        eatenFoodEffects.push({
-            x: ghostPos[0],
-            y: ghostPos[1],
-            size: cellSize,
-            opacity: 255, // שקיפות מלאה בהתחלה
-            image: ghostImage
-        });
+    eatenFoodEffects.push({
+        x: ghostPos[0],
+        y: ghostPos[1],
+        size: cellSize * 2, // מתחיל בגודל המוגדל
+        opacity: 255,
+        image: ghostImage
+    });
 
         spawnNewGhost();
         playRandomEatSound();
@@ -309,22 +320,23 @@ function keyPressed() {
 
 function mousePressed() {
     if (gameState === "MENU") {
-        if (mouseX > width / 2 - 60 && mouseX < width / 2 + 60) {
-            if (mouseY > height - 150 && mouseY < height - 110) {
-                gameState = "PLAYING";
-                resetGame();
-            } else if (mouseY > height - 90 && mouseY < height - 50) {
-                console.log("Game Closed!");
-                noLoop();
-            }
+        if (mouseX > width / 2 - 60 && mouseX < width / 2 + 60 &&
+            mouseY > height - 150 && mouseY < height - 110) {
+            gameState = "PLAYING";
+            resetGame();
         }
     }
 
     if (gameState === "GAME_OVER") {
-        if (mouseX > width / 2 - 60 && mouseX < width / 2 + 60 &&
-            mouseY > height / 2 + 20 && mouseY < height / 2 + 60) {
-            gameState = "PLAYING";
-            resetGame();
+        let btnX = width / 2 - 60;
+        let btnY = height / 2;
+        let btnWidth = 120;
+        let btnHeight = 40;
+
+        if (mouseX > btnX && mouseX < btnX + btnWidth &&
+            mouseY > btnY && mouseY < btnY + btnHeight) {
+            gameState = "PLAYING"; // החזרת המשחק למצב פעיל
+            resetGame(); // הפעלת המשחק מחדש
         }
     }
 
@@ -354,9 +366,12 @@ function spawnNewGhost() {
 }
 
 function drawGhost() {
-    let bounceOffset = sin(frameCount * 0.1) * 5;
-    image(ghostImage, ghostPos[0], ghostPos[1] + bounceOffset, cellSize, cellSize);
+    let foodSize = cellSize * 1.5; // 50% יותר גדול
+    let offset = (foodSize - cellSize) / 2;
+    image(ghostImage, ghostPos[0] - offset, ghostPos[1] - offset, foodSize, foodSize);
 }
+
+
 
 function playRandomEatSound() {
     if (eatSounds.length > 0) {
@@ -388,8 +403,22 @@ function drawSnake() {
 }
 
 function drawScore() {
+    let padding = width * 0.03; // מרווח מהקצה
+    let boxHeight = height * 0.05; // גובה תיבת הניקוד
+    let textSizeValue = width * 0.045; // גודל טקסט יחסי
+
+    // רקע כהה מאחורי הניקוד והשלב
+    fill(0, 0, 0, 150);
+    rect(padding, padding, width * 0.35, boxHeight, 8);
+    rect(width - width * 0.35 - padding, padding, width * 0.35, boxHeight, 8);
+
+    // הצגת הניקוד והשלב
     fill(255);
-    textSize(16);
-    text(`Score: ${score}`, 10, 20);
-    text(`Level: ${level}`, width - 70, 20);
+    textSize(textSizeValue);
+    textAlign(LEFT, CENTER);
+    text(`Score: ${score}`, padding + 10, padding + boxHeight / 2);
+
+    textAlign(RIGHT, CENTER);
+    text(`Level: ${level}`, width - padding - 10, padding + boxHeight / 2);
 }
+
