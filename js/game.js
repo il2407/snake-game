@@ -41,17 +41,20 @@ function preload() {
     winImage = loadImage("assets/win_image.png");
 
     // Load videos and mute them
-    videoWin = createVideo("assets/win_video.mp4", onCanPlay);
-    videoWin.hide();
-    videoWin.volume(1); // Mute to allow autoplay
+  videoWin = createVideo("assets/win_video.mp4");
+  videoWin.hide();
+  videoWin.attribute("playsinline", "");
+  videoWin.volume(1);          // unmuted if the user gesture is granted
 
-    videoLevel1 = createVideo("assets/win_video2.mp4", onCanPlay);
-    videoLevel1.hide();
-    videoLevel1.volume(1);
+  videoLevel1 = createVideo("assets/win_video2.mp4");
+  videoLevel1.hide();
+  videoLevel1.attribute("playsinline", "");
+  videoLevel1.volume(1);
 
-    videoLose = createVideo("assets/lose_video.mp4", onCanPlay);
-    videoLose.hide();
-    videoLose.volume(1);
+  videoLose = createVideo("assets/lose_video.mp4");
+  videoLose.hide();
+  videoLose.attribute("playsinline", "");
+  videoLose.volume(1);
 
     // Load other assets
     ghostImages = [
@@ -194,16 +197,17 @@ function drawMenu() {
     }
 
     /** 🔹 חלק 3: כפתור SURVIVE! (בגודל זהה לשאר החלקים) **/
-    let btnWidth = width * 0.6;
-    let btnHeight = sectionHeight * 0.6;
-    let btnX = width / 2 - btnWidth / 2;
-    let btnY = sectionHeight * 2 + sectionHeight * 0.2;
+  let btnWidth = width * 0.6;
+  let btnHeight = height * 0.1;
+  let btnX = width / 2 - btnWidth / 2;
+  let btnY = height * 0.7;
 
-    fill(0, 255, 153);
-    rect(btnX, btnY, btnWidth, btnHeight, 15);
-    fill(0);
-    textSize(width * 0.07);
-    text("SURVIVE!", width / 2, btnY + btnHeight / 2);
+  fill(0, 255, 153);
+  rect(btnX, btnY, btnWidth, btnHeight, 15);
+  fill(0);
+  textSize(width * 0.07);
+  textAlign(CENTER, CENTER);
+  text("SURVIVE!", width/2, btnY + btnHeight/2);
 }
 
 
@@ -389,17 +393,22 @@ function mousePressed() {
 
 
 
-    if (gameState === "MENU") {
-        let btnX = width / 2 - 60;
-        let btnY = height - 150;
-        let btnWidth = 120;
-        let btnHeight = 40;
-        if (mouseX > btnX && mouseX < btnX + btnWidth &&
-            mouseY > btnY && mouseY < btnY + btnHeight) {
-            gameState = "PLAYING";
-            resetGame();
-        }
+ if (gameState === "MENU") {
+    // Check if user clicked inside the SURVIVE! button:
+    let btnWidth = width * 0.6;
+    let btnHeight = height * 0.1;
+    let btnX = width / 2 - btnWidth / 2;
+    let btnY = height * 0.7;
+
+    if (
+      mouseX > btnX && mouseX < btnX + btnWidth &&
+      mouseY > btnY && mouseY < btnY + btnHeight
+    ) {
+      // USER GESTURE! Audio is unlocked now.
+      gameState = "PLAYING";
+      resetGame();
     }
+  }
 
 if (gameState === "GAME_OVER") {
     let btnWidth = width * 0.6;
