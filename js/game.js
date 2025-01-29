@@ -176,7 +176,7 @@ function drawMenu() {
     /** 🔹 חלק 1: YOU + תמונות הנחש **/
     fill(255);
     textSize(width * 0.07);
-    text("YOU2", width / 2, sectionHeight * 0.25);
+    text("YOU", width / 2, sectionHeight * 0.25);
 
     // הצגת ראש הנחש וגוף הנחש מתחת לטקסט
     image(snakeHeadImage, width / 2 - imageSize - 10, sectionHeight * 0.4, imageSize, imageSize);
@@ -218,11 +218,13 @@ function drawWinScreen() {
     fill(255);
     text("You survived 2 years!", width / 2, height * 0.2);
 
-    // Ensure the video starts only after user interaction
+  if (!videoWinPlaying) {
     videoWin.position(width * 0.1, height * 0.3);
     videoWin.size(width * 0.8, height * 0.4);
     videoWin.show();
-
+    videoWin.play();         // <-- Only called once
+    videoWinPlaying = true;
+  }
     // Add play button for mobile users
     let btnWidth = width * 0.6;
     let btnHeight = height * 0.08;
@@ -245,12 +247,13 @@ function drawLevelTransition() {
     text(`You survived 1 year!`, width / 2, height * 0.2);
 
     // הצגת הסרטון רק אם לא מוצג עדיין
-    if (!videoLevel1.elt.playing) {
-        videoLevel1.position(width * 0.1, height * 0.3);
-        videoLevel1.size(width * 0.8, height * 0.4);
-        videoLevel1.show();
-        videoLevel1.play();
-    }
+  if (!videoLevel1Playing) {
+    videoLevel1.position(width * 0.1, height * 0.3);
+    videoLevel1.size(width * 0.8, height * 0.4);
+    videoLevel1.show();
+    videoLevel1.play();       // <-- Only called once
+    videoLevel1Playing = true;
+  }
 
     // כפתור מעבר לשלב 2
     let btnWidth = width * 0.6;
