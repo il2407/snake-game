@@ -38,6 +38,12 @@ function preload() {
     videoWin = createVideo("assets/win_video.mp4");
     videoWin.hide(); // מחביאים את הסרטון עד לסיום המשחק
 
+        videoLevel1 = createVideo("assets/win_video2.mp4");
+        videoLevel1.hide(); // מחביאים את הסרטון של סוף שלב 1
+
+            videoLose = createVideo("assets/lose_video.mp4");
+            videoLose.hide(); // מחביאים את הסרטון של הפסד
+
     ghostImages = [
         loadImage("assets/miso.png"),
         loadImage("assets/mold.png"),
@@ -191,21 +197,6 @@ function drawMenu() {
 }
 
 
-
-function drawLevelTransition() {
-    background(0);
-    textAlign(CENTER, CENTER);
-    textSize(32);
-    fill(255);
-    text(`You survived ${level} year!`, width / 2, height / 2 - 20);
-
-    fill(0, 255, 0);
-    rect(width / 2 - 80, height / 2 + 30, 160, 40);
-    fill(0);
-    textSize(20);
-    text("Continue to Year 2", width / 2, height / 2 + 50);
-}
-
 function drawWinScreen() {
     background(0);
     textAlign(CENTER, CENTER);
@@ -213,15 +204,16 @@ function drawWinScreen() {
     fill(255);
     text("You survived 2 years!", width / 2, height * 0.2);
 
-    // אם הסרטון עדיין לא מתנגן, ננגן אותו
-    if (!videoWin.elt.playing) {
+    if (videoWin) {
         videoWin.position(width * 0.1, height * 0.3);
         videoWin.size(width * 0.8, height * 0.4);
         videoWin.show();
         videoWin.play();
+    } else {
+        console.error("Error: win video not loaded");
     }
 
-    // כפתור לחזור לתפריט הראשי
+    // כפתור לחזרה לתפריט הראשי
     let btnWidth = width * 0.6;
     let btnHeight = height * 0.08;
     let btnX = width / 2 - btnWidth / 2;
@@ -238,42 +230,55 @@ function drawWinScreen() {
 function drawLevelTransition() {
     background(0);
     textAlign(CENTER, CENTER);
-
-    // הצגת הודעת מעבר שלב
     fill(255);
-    textSize(width * 0.07); // גודל פונט מותאם
-    text(`You survived ${level} year!`, width / 2, height * 0.4);
+    textSize(width * 0.07);
+    text(`You survived 1 year!`, width / 2, height * 0.2);
 
-    // כפתור "Continue"
+    // הצגת הסרטון רק אם לא מוצג עדיין
+    if (!videoLevel1.elt.playing) {
+        videoLevel1.position(width * 0.1, height * 0.3);
+        videoLevel1.size(width * 0.8, height * 0.4);
+        videoLevel1.show();
+        videoLevel1.play();
+    }
+
+    // כפתור מעבר לשלב 2
     let btnWidth = width * 0.6;
     let btnHeight = height * 0.08;
     let btnX = width / 2 - btnWidth / 2;
-    let btnY = height * 0.55;
+    let btnY = height * 0.75;
 
     fill(0, 255, 0);
     rect(btnX, btnY, btnWidth, btnHeight, 15);
-
     fill(0);
     textSize(width * 0.05);
     text("Continue to Year 2", width / 2, btnY + btnHeight / 2);
 }
 
 function drawGameOver() {
-    background(30);
+    background(0);
     textAlign(CENTER, CENTER);
 
     fill(255);
     textSize(width * 0.07);
-    text("Game Over!", width / 2, height * 0.4);
+    text("Game Over!", width / 2, height * 0.2);
 
-    let btnWidth = width * 0.5;
+    // הצגת הסרטון רק אם הוא עדיין לא מופיע
+    if (!videoLose.elt.playing) {
+        videoLose.position(width * 0.1, height * 0.3);
+        videoLose.size(width * 0.8, height * 0.4);
+        videoLose.show();
+        videoLose.play();
+    }
+
+    // כפתור Restart לאחר הצפייה בסרטון
+    let btnWidth = width * 0.6;
     let btnHeight = height * 0.08;
     let btnX = width / 2 - btnWidth / 2;
-    let btnY = height * 0.55;
+    let btnY = height * 0.75;
 
-    fill(0, 255, 0);
+    fill(255, 0, 0);
     rect(btnX, btnY, btnWidth, btnHeight, 15);
-
     fill(0);
     textSize(width * 0.05);
     text("Restart", width / 2, btnY + btnHeight / 2);
@@ -313,13 +318,16 @@ function moveSnake() {
         spawnNewGhost();
         playRandomEatSound();
 
-        if (score === maxScorePerLevel) {
-            if (level === 1) {
-                gameState = "LEVEL_TRANSITION";
-            } else if (level === 2) {
-                gameState = "WIN_SCREEN";
-            }
-        }
+if (score === maxScorePerLevel) {
+    if (level === 1) {
+        gameState = "LEVEL_TRANSITION";
+    } else if (level === 2) {
+        gameState = "WIN_SCREEN";
+        videoWin.show();
+        videoWin.play();
+    }
+}
+
     } else {
         snake.pop();
     }
@@ -360,6 +368,21 @@ function keyPressed() {
 
 
 function mousePressed() {
+if (gameState === "WIN_SCREEN") {
+    let btnWidth = width * 0.6;
+    let btnHeight = height * 0.08;
+    let btnX = width / 2 - btnWidth / 2;
+    let btnY = height * 0.75;
+
+    if (mouseX > btnX && mouseX < btnX + btnWidth &&
+        mouseY > btnY && mouseY < btnY + btnHeight) {
+        videoWin.stop();
+        videoWin.hide();
+        gameState = "MENU";
+    }
+}
+
+
     if (gameState === "MENU") {
         let btnX = width / 2 - 60;
         let btnY = height - 150;
@@ -372,37 +395,53 @@ function mousePressed() {
         }
     }
 
-    if (gameState === "GAME_OVER") {
-        let btnX = width / 2 - 60;
-        let btnY = height - 150;
-        let btnWidth = 120;
-        let btnHeight = 40;
+if (gameState === "GAME_OVER") {
+    let btnWidth = width * 0.6;
+    let btnHeight = height * 0.08;
+    let btnX = width / 2 - btnWidth / 2;
+    let btnY = height * 0.75;
 
-        if (mouseX > btnX && mouseX < btnX + btnWidth &&
-            mouseY > btnY && mouseY < btnY + btnHeight) {
-            gameState = "MENU"; // חזרה לתפריט הראשי
-            resetGame();
-        }
+    if (mouseX > btnX && mouseX < btnX + btnWidth &&
+        mouseY > btnY && mouseY < btnY + btnHeight) {
+        videoLose.stop();
+        videoLose.hide();
+        gameState = "PLAYING";
+        resetGame();
     }
+}
 
-    if (gameState === "LEVEL_TRANSITION") {
-        if (mouseX > width / 2 - 80 && mouseX < width / 2 + 80 &&
-            mouseY > height / 2 + 30 && mouseY < height / 2 + 70) {
-            level = 2;
-            score = 0;
-            gameState = "PLAYING";
-            resetGame();
-        }
+
+if (gameState === "LEVEL_TRANSITION") {
+    let btnWidth = width * 0.6;
+    let btnHeight = height * 0.08;
+    let btnX = width / 2 - btnWidth / 2;
+    let btnY = height * 0.75;
+
+    if (mouseX > btnX && mouseX < btnX + btnWidth &&
+        mouseY > btnY && mouseY < btnY + btnHeight) {
+        videoLevel1.stop();
+        videoLevel1.hide();
+        level = 2;
+        score = 0;
+        gameState = "PLAYING";
+        resetGame();
     }
+}
+
+
 }
 
 function resetGame() {
     snake = [[100, 50], [90, 50], [80, 50]];
     snakeDir = "RIGHT";
     score = 0;
-    level = 1;
     gameOver = false;
-    gameState = "PLAYING"; // החזרת המשחק למצב פעיל
+
+    // ווידוא שהמשחק נטען לשלב 2 ולא מוחק את זה
+    if (gameState === "PLAYING" && level === 2) {
+        console.log("Starting Level 2!");
+    }
+
     spawnNewGhost();
 }
 
