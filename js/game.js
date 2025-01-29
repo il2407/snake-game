@@ -63,7 +63,7 @@ function preload() {
     ];
 
     for (let i = 1; i <= 1123; i++) {
-        let soundFile = loadSound(`song_parts/part${i}.mp3`);
+        let soundFile = loadSound(`assets/eat_sound.mp3`);
         eatSounds.push(soundFile);
     }
 }
