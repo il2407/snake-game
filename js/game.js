@@ -10,12 +10,12 @@ let touchEndY = 0;
 let swipeThreshold = 30; // מרחק מינימלי לסווייפ
 let ghostPos;
 let ghostImage;
-let score = 0;
+let gameOver = false;
+let gameState = "MENU"; // מצבים: MENU, PLAYING, LEVEL_TRANSITION, GAME_OVER
 let level = 1;
+let score = 0;
 let maxScorePerLevel = 12;
 let totalLevels = 2;
-let gameOver = false;
-let gameState = "MENU"; // Possible states: MENU, PLAYING, LEVEL_TRANSITION, GAME_OVER
 let collectedItems = []; // List of eaten items
 let snakeHeadImage, backgroundImage, winImage;
 let ghostImages = [];
@@ -46,7 +46,7 @@ function preload() {
 
 function setup() {
     createCanvas(width, height);
-    frameRate(8);
+    frameRate(3);
 
     document.addEventListener("touchstart", (event) => {
         event.preventDefault();
@@ -107,6 +107,11 @@ function draw() {
         return;
     }
 
+    if (gameState === "WIN_SCREEN") {
+        drawWinScreen();
+        return;
+    }
+
     if (gameOver) {
         drawGameOver();
         return;
@@ -157,6 +162,34 @@ function drawMenu() {
     text("Exit", width / 2, height - 70);
 }
 
+
+
+function drawLevelTransition() {
+    background(0);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    fill(255);
+    text(`You survived ${level} year!`, width / 2, height / 2 - 20);
+
+    fill(0, 255, 0);
+    rect(width / 2 - 80, height / 2 + 30, 160, 40);
+    fill(0);
+    textSize(20);
+    text("Continue to Year 2", width / 2, height / 2 + 50);
+}
+
+function drawWinScreen() {
+    background(0);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    fill(255);
+    text("You survived 2 years!", width / 2, height / 2 - 20);
+
+    textSize(20);
+    text("Congratulations!", width / 2, height / 2 + 20);
+}
+
+
 function drawLevelTransition() {
     background(0);
     textAlign(CENTER, CENTER);
@@ -176,10 +209,16 @@ function drawGameOver() {
     textAlign(CENTER, CENTER);
     textSize(32);
     fill(255);
-    text("Game Over!", width / 2, height / 2);
-    textSize(16);
-    text("Press R to Restart", width / 2, height / 2 + 40);
+    text("Game Over!", width / 2, height / 2 - 20);
+
+    // כפתור Restart
+    fill(0, 255, 0);
+    rect(width / 2 - 60, height / 2 + 20, 120, 40);
+    fill(0);
+    textSize(20);
+    text("Restart", width / 2, height / 2 + 40);
 }
+
 
 function moveSnake() {
     let head = [...snake[0]];
@@ -204,15 +243,14 @@ function moveSnake() {
         spawnNewGhost();
         playRandomEatSound();
 
-        if (score === maxScorePerLevel) {
-            level++;
-            if (level > totalLevels) {
-                displayWinScreen();
-                noLoop();
-            } else {
-                gameState = "LEVEL_TRANSITION";
-            }
+    if (score === maxScorePerLevel) {
+        if (level === 1) {
+            gameState = "LEVEL_TRANSITION";
+        } else if (level === 2) {
+            gameState = "WIN_SCREEN"; // אם זה השלב האחרון, מסך ניצחון
         }
+    }
+
     } else {
         snake.pop();
     }
@@ -241,9 +279,19 @@ function mousePressed() {
         }
     }
 
-    if (gameState === "LEVEL_TRANSITION") {
+    if (gameState === "GAME_OVER") {
         if (mouseX > width / 2 - 60 && mouseX < width / 2 + 60 &&
+            mouseY > height / 2 + 20 && mouseY < height / 2 + 60) {
+            gameState = "PLAYING";
+            resetGame();
+        }
+    }
+
+    if (gameState === "LEVEL_TRANSITION") {
+        if (mouseX > width / 2 - 80 && mouseX < width / 2 + 80 &&
             mouseY > height / 2 + 30 && mouseY < height / 2 + 70) {
+            level = 2;
+            score = 0;
             gameState = "PLAYING";
             resetGame();
         }
@@ -254,11 +302,10 @@ function resetGame() {
     snake = [[100, 50], [90, 50], [80, 50]];
     snakeDir = "RIGHT";
     score = 0;
-    level = 1;
-    collectedItems = [];
     spawnNewGhost();
     gameOver = false;
 }
+
 
 function spawnNewGhost() {
     ghostPos = randomGhostPosition();
