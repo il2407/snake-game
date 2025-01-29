@@ -44,7 +44,9 @@ function preload() {
         loadImage("assets/gamba.png"),
         loadImage("assets/floor.png"),
         loadImage("assets/rest.png"),
-        loadImage("assets/tavor.png")
+        loadImage("assets/tavor.png"),
+        loadImage("assets/rest2.png"),
+        loadImage("assets/india.png")
     ];
 
     snakeBodyImages = [
@@ -144,44 +146,43 @@ function drawMenu() {
     background(15, 23, 42);
     textAlign(CENTER, CENTER);
 
-    textSize(width * 0.07);
+    let sectionHeight = height / 3; // כל חלק תופס שליש מהמסך
+    let imageSize = width * 0.15; // גודל התמונות
+
+    /** 🔹 חלק 1: YOU + תמונות הנחש **/
     fill(255);
-    text("YOU:", width / 2, height * 0.15);
+    textSize(width * 0.07);
+    text("YOU", width / 2, sectionHeight * 0.25);
 
-    // הצגת תמונת ראש הנחש
-    image(snakeHeadImage, width / 2 - 60, height * 0.18, 80, 80);
+    // הצגת ראש הנחש וגוף הנחש מתחת לטקסט
+    image(snakeHeadImage, width / 2 - imageSize - 10, sectionHeight * 0.4, imageSize, imageSize);
+    image(snakeBodyImages[1], width / 2 + 10, sectionHeight * 0.4, imageSize, imageSize);
 
-    // הצגת תמונת גוף ליד הראש (עם מרווח קטן)
-    image(snakeBodyImages[1], width / 2 + 10, height * 0.18, 80, 80);
+    /** 🔹 חלק 2: FOOD + תמונות האוכל **/
+    fill(255);
+    text("FOOD", width / 2, sectionHeight + sectionHeight * 0.25);
 
-    text("FOOD:", width / 2, height * 0.3);
-
-    let startY = height * 0.33;
+    let foodStartY = sectionHeight + sectionHeight * 0.4;
     let cols = 4;
     let spacing = width * 0.18;
 
     for (let i = 0; i < ghostImages.length; i++) {
         let x = (i % cols) * spacing + (width / 2 - ((cols - 1) * spacing) / 2);
-        let y = startY + floor(i / cols) * spacing;
-        image(ghostImages[i], x, y, 70, 70);
+        let y = foodStartY + floor(i / cols) * spacing;
+        image(ghostImages[i], x, y, imageSize, imageSize);
     }
 
-    // כפתור "SURVIVE"
+    /** 🔹 חלק 3: כפתור SURVIVE! (בגודל זהה לשאר החלקים) **/
     let btnWidth = width * 0.6;
-    let btnHeight = height * 0.08;
+    let btnHeight = sectionHeight * 0.6;
     let btnX = width / 2 - btnWidth / 2;
+    let btnY = sectionHeight * 2 + sectionHeight * 0.2;
 
     fill(0, 255, 153);
-    rect(btnX, height * 0.75, btnWidth, btnHeight, 15);
+    rect(btnX, btnY, btnWidth, btnHeight, 15);
     fill(0);
-    textSize(width * 0.05);
-    text("SURVIVE", width / 2, height * 0.75 + btnHeight / 2);
-
-    // כפתור "EXIT"
-    fill(255, 77, 77);
-    rect(btnX, height * 0.85, btnWidth, btnHeight, 15);
-    fill(0);
-    text("EXIT", width / 2, height * 0.85 + btnHeight / 2);
+    textSize(width * 0.07);
+    text("SURVIVE!", width / 2, btnY + btnHeight / 2);
 }
 
 
@@ -355,8 +356,12 @@ function keyPressed() {
 
 function mousePressed() {
     if (gameState === "MENU") {
-        if (mouseX > width / 2 - 60 && mouseX < width / 2 + 60 &&
-            mouseY > height - 150 && mouseY < height - 110) {
+        let btnX = width / 2 - 60;
+        let btnY = height - 150;
+        let btnWidth = 120;
+        let btnHeight = 40;
+        if (mouseX > btnX && mouseX < btnX + btnWidth &&
+            mouseY > btnY && mouseY < btnY + btnHeight) {
             gameState = "PLAYING";
             resetGame();
         }
@@ -364,14 +369,14 @@ function mousePressed() {
 
     if (gameState === "GAME_OVER") {
         let btnX = width / 2 - 60;
-        let btnY = height / 2;
+        let btnY = height - 150;
         let btnWidth = 120;
         let btnHeight = 40;
 
         if (mouseX > btnX && mouseX < btnX + btnWidth &&
             mouseY > btnY && mouseY < btnY + btnHeight) {
-            gameState = "PLAYING"; // החזרת המשחק למצב פעיל
-            resetGame(); // הפעלת המשחק מחדש
+            gameState = "MENU"; // חזרה לתפריט הראשי
+            resetGame();
         }
     }
 
@@ -390,9 +395,12 @@ function resetGame() {
     snake = [[100, 50], [90, 50], [80, 50]];
     snakeDir = "RIGHT";
     score = 0;
-    spawnNewGhost();
+    level = 1;
     gameOver = false;
+    gameState = "PLAYING"; // החזרת המשחק למצב פעיל
+    spawnNewGhost();
 }
+
 
 
 function spawnNewGhost() {
