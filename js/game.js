@@ -265,6 +265,9 @@ function drawLevelTransition() {
     text("Continue to Year 2", width / 2, btnY + btnHeight / 2);
 }
 
+let videoLosePlaying = false;
+
+
 function drawGameOver() {
     background(0);
     textAlign(CENTER, CENTER);
@@ -274,12 +277,15 @@ function drawGameOver() {
     text("Game Over!", width / 2, height * 0.2);
 
     // הצגת הסרטון רק אם הוא עדיין לא מופיע
-    if (!videoLose.elt.playing) {
-        videoLose.position(width * 0.1, height * 0.3);
-        videoLose.size(width * 0.8, height * 0.4);
-        videoLose.show();
-        videoLose.play();
-    }
+  if (!videoLosePlaying) {
+    // position/size/show the video only once, too
+    videoLose.position(width * 0.1, height * 0.3);
+    videoLose.size(width * 0.8, height * 0.4);
+    videoLose.show();
+
+    videoLose.play();       // <-- This call no longer repeats
+    videoLosePlaying = true;
+  }
 
     // כפתור Restart לאחר הצפייה בסרטון
     let btnWidth = width * 0.6;
