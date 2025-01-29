@@ -176,7 +176,7 @@ function drawMenu() {
     /** 🔹 חלק 1: YOU + תמונות הנחש **/
     fill(255);
     textSize(width * 0.07);
-    text("YOU", width / 2, sectionHeight * 0.25);
+    text("YOU2", width / 2, sectionHeight * 0.25);
 
     // הצגת ראש הנחש וגוף הנחש מתחת לטקסט
     image(snakeHeadImage, width / 2 - imageSize - 10, sectionHeight * 0.4, imageSize, imageSize);
