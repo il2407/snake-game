@@ -20,6 +20,8 @@ let collectedItems = []; // List of eaten items
 let snakeHeadImage, backgroundImage, winImage;
 let ghostImages = [];
 let eatSounds = [];
+let eatenFoodEffects = []; // מאגר לאוכל שנאכל ואנימציותיו
+
 
 function preload() {
     snakeHeadImage = loadImage("assets/face.png");
@@ -46,7 +48,7 @@ function preload() {
 
 function setup() {
     createCanvas(width, height);
-    frameRate(3);
+    frameRate(6);
 
     document.addEventListener("touchstart", (event) => {
         event.preventDefault();
@@ -120,27 +122,32 @@ function draw() {
     background(backgroundImage);
     drawSnake();
     drawGhost();
+    animateEatenFood(); // הצגת האוכל שנאכל עם האנימציה
     drawScore();
     moveSnake();
 }
 
 function drawMenu() {
-    background(50);
+
+    let gradientColor = lerpColor(color(15, 23, 42), color(22, 30, 58), sin(frameCount * 0.01));
+    background(gradientColor);
+
+    background(15, 23, 42); // רקע כהה אלגנטי
     textAlign(CENTER, CENTER);
-    textSize(32);
+    textSize(24);
     fill(255);
-    text("you:", width / 2, height / 6);
+    text("YOU:", width / 2, height / 6);
 
     // הצגת תמונת ראש הנחש
-    image(snakeHeadImage, width / 2 - 20, height / 6 + 20, 40, 40);
+    image(snakeHeadImage, width / 2 - 20, height / 6 + 30, 40, 40);
 
-    // טקסט "food:"
-    text("food:", width / 2, height / 3);
+    // טקסט "FOOD:"
+    text("FOOD:", width / 2, height / 3);
 
     // הצגת תמונות האוכל (מסודרות בשורות)
     let startY = height / 3 + 30;
-    let cols = 4; // מספר עמודות בשורה
-    let spacing = 60; // ריווח בין התמונות
+    let cols = 4;
+    let spacing = 60;
 
     for (let i = 0; i < ghostImages.length; i++) {
         let x = (i % cols) * spacing + (width / 2 - ((cols - 1) * spacing) / 2);
@@ -148,18 +155,19 @@ function drawMenu() {
         image(ghostImages[i], x, y, 40, 40);
     }
 
-    // כפתור "survive" להתחלת המשחק
-    fill(0, 255, 0);
-    rect(width / 2 - 60, height - 150, 120, 40);
+    // כפתור "SURVIVE"
+    fill(0, 255, 153);
+    rect(width / 2 - 80, height - 150, 160, 50, 10);
     fill(0);
     textSize(20);
-    text("survive", width / 2, height - 130);
+    text("SURVIVE", width / 2, height - 130);
 
-    // כפתור "Exit" ליציאה
-    fill(255, 0, 0);
-    rect(width / 2 - 60, height - 90, 120, 40);
+    // כפתור "EXIT"
+    fill(255, 77, 77);
+    rect(width / 2 - 80, height - 80, 160, 50, 10);
     fill(0);
-    text("Exit", width / 2, height - 70);
+    textSize(20);
+    text("EXIT", width / 2, height - 60);
 }
 
 
@@ -240,21 +248,54 @@ function moveSnake() {
     if (dist(head[0], head[1], ghostPos[0], ghostPos[1]) < cellSize) {
         score++;
         collectedItems.push(ghostImage);
+
+        // הוספת האוכל שנאכל לאנימציה
+        eatenFoodEffects.push({
+            x: ghostPos[0],
+            y: ghostPos[1],
+            size: cellSize,
+            opacity: 255, // שקיפות מלאה בהתחלה
+            image: ghostImage
+        });
+
         spawnNewGhost();
         playRandomEatSound();
 
-    if (score === maxScorePerLevel) {
-        if (level === 1) {
-            gameState = "LEVEL_TRANSITION";
-        } else if (level === 2) {
-            gameState = "WIN_SCREEN"; // אם זה השלב האחרון, מסך ניצחון
+        if (score === maxScorePerLevel) {
+            if (level === 1) {
+                gameState = "LEVEL_TRANSITION";
+            } else if (level === 2) {
+                gameState = "WIN_SCREEN";
+            }
         }
-    }
-
     } else {
         snake.pop();
     }
+
+
+
 }
+
+function animateEatenFood() {
+    for (let i = eatenFoodEffects.length - 1; i >= 0; i--) {
+        let food = eatenFoodEffects[i];
+
+        // הגדלת המזון והפחתת השקיפות בהדרגה
+        food.size += 2;
+        food.opacity -= 15;
+
+        // ציור המזון עם שקיפות
+        tint(255, food.opacity);
+        image(food.image, food.x, food.y, food.size, food.size);
+        noTint();
+
+        // אם המזון נעלם לחלוטין, להסיר אותו מהמערך
+        if (food.opacity <= 0) {
+            eatenFoodEffects.splice(i, 1);
+        }
+    }
+}
+
 
 function keyPressed() {
     if (keyCode === UP_ARROW && snakeDir !== "DOWN") snakeDir = "UP";
@@ -313,7 +354,8 @@ function spawnNewGhost() {
 }
 
 function drawGhost() {
-    image(ghostImage, ghostPos[0], ghostPos[1], cellSize, cellSize);
+    let bounceOffset = sin(frameCount * 0.1) * 5;
+    image(ghostImage, ghostPos[0], ghostPos[1] + bounceOffset, cellSize, cellSize);
 }
 
 function playRandomEatSound() {
@@ -332,14 +374,17 @@ function randomGhostPosition() {
 }
 
 function drawSnake() {
+    let colors = [
+        color(0, 255, 0),
+        color(0, 200, 50),
+        color(0, 180, 100),
+    ];
+
     for (let i = 0; i < snake.length; i++) {
-        if (i === 0) {
-            image(snakeHeadImage, snake[i][0], snake[i][1], cellSize, cellSize);
-        } else {
-            fill(0, 255, 0);
-            rect(snake[i][0], snake[i][1], cellSize, cellSize);
-        }
+        fill(colors[i % colors.length]);
+        rect(snake[i][0], snake[i][1], cellSize, cellSize, 5);
     }
+
 }
 
 function drawScore() {

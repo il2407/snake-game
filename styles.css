@@ -1,33 +1,36 @@
 body {
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: black;
-    margin: 0;
+    background-color: #0f172a;
+    font-family: 'Press Start 2P', cursive;
+    color: white;
+    overflow: hidden;
 }
 
 canvas {
-    border: 5px solid white;
-}
-
-button {
-    width: 120px;
-    height: 40px;
-    font-size: 18px;
-    text-align: center;
+    border: 5px solid #fff;
     border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* עיצוב כפתורים */
+button {
+    background-color: #00ff99;
+    color: black;
+    font-size: 16px;
+    padding: 12px 20px;
     border: none;
+    border-radius: 10px;
     cursor: pointer;
-    margin: 10px;
+    margin-top: 10px;
+    font-family: 'Press Start 2P', cursive;
+    transition: 0.3s ease;
 }
 
-#start-button {
-    background-color: green;
-    color: white;
-}
-
-#exit-button {
-    background-color: red;
-    color: white;
+button:hover {
+    background-color: #00cc77;
+    transform: scale(1.05);
 }
