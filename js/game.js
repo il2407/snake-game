@@ -29,23 +29,29 @@ let moveDelay = 10; // הנחש יזוז רק כל 6 פריימים
 
 let snakeBodyImages = [];
 
+function onCanPlay() {
+    this.elt.addEventListener("canplaythrough", () => {
+        console.log(`${this.elt.src} is ready to play!`);
+    });
+}
+
 function preload() {
     snakeHeadImage = loadImage("assets/face.png");
     backgroundImage = loadImage("assets/background.png");
     winImage = loadImage("assets/win_image.png");
 
-    // Load videos and mute them for mobile autoplay
-    videoWin = createVideo("assets/win_video.mp4");
+    // Load videos and mute them
+    videoWin = createVideo("assets/win_video.mp4", onCanPlay);
     videoWin.hide();
-    videoWin.volume(0); // Mute video to allow autoplay on mobile
+    videoWin.volume(0); // Mute to allow autoplay
 
-    videoLevel1 = createVideo("assets/win_video2.mp4");
+    videoLevel1 = createVideo("assets/win_video2.mp4", onCanPlay);
     videoLevel1.hide();
-    videoLevel1.volume(0); // Mute video
+    videoLevel1.volume(0);
 
-    videoLose = createVideo("assets/lose_video.mp4");
+    videoLose = createVideo("assets/lose_video.mp4", onCanPlay);
     videoLose.hide();
-    videoLose.volume(0); // Mute video
+    videoLose.volume(0);
 
     // Load other assets
     ghostImages = [
