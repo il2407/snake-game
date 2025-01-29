@@ -22,6 +22,8 @@ let eatSounds = [];
 let eatenFoodEffects = []; // מאגר לאוכל שנאכל ואנימציותיו
 let width = window.innerWidth * 0.9; // 90% מרוחב המסך
 let height = window.innerHeight * 0.9; // 90% מגובה המסך
+let moveDelay = 10; // הנחש יזוז רק כל 6 פריימים
+
 
 
 
@@ -63,7 +65,7 @@ function preload() {
 
 function setup() {
     createCanvas(width, height);
-    frameRate(6);
+    frameRate(30);
 
     document.addEventListener("touchstart", (event) => {
         event.preventDefault();
@@ -113,22 +115,20 @@ function handleTouchEnd(event) {
 }
 
 
+
 function draw() {
     if (gameState === "MENU") {
         drawMenu();
         return;
     }
-
     if (gameState === "LEVEL_TRANSITION") {
         drawLevelTransition();
         return;
     }
-
     if (gameState === "WIN_SCREEN") {
         drawWinScreen();
         return;
     }
-
     if (gameOver) {
         drawGameOver();
         return;
@@ -137,10 +137,15 @@ function draw() {
     background(backgroundImage);
     drawSnake();
     drawGhost();
-    animateEatenFood(); // הצגת האוכל שנאכל עם האנימציה
+    animateEatenFood();
     drawScore();
-    moveSnake();
+
+    // הנחש יזוז רק כל 'moveDelay' פריימים
+    if (frameCount % moveDelay === 0) {
+        moveSnake();
+    }
 }
+
 
 function drawMenu() {
     background(15, 23, 42);
