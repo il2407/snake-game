@@ -3,6 +3,11 @@ let width = 400;
 let height = 700;
 let snake = [];
 let snakeDir = "RIGHT";
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+let swipeThreshold = 30; // מרחק מינימלי לסווייפ
 let ghostPos;
 let ghostImage;
 let score = 0;
@@ -41,7 +46,35 @@ function preload() {
 function setup() {
     createCanvas(width, height);
     frameRate(8);
+
+    // מאזינים לסווייפ במסך מגע
+    document.addEventListener("touchstart", handleTouchStart, false);
+    document.addEventListener("touchend", handleTouchEnd, false);
 }
+
+// פונקציה לזיהוי תחילת מגע
+function handleTouchStart(event) {
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+}
+
+// פונקציה לזיהוי סוף מגע והשוואת כיוון
+function handleTouchEnd(event) {
+    touchEndX = event.changedTouches[0].clientX;
+    touchEndY = event.changedTouches[0].clientY;
+
+    let diffX = touchEndX - touchStartX;
+    let diffY = touchEndY - touchStartY;
+
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
+        if (diffX > 0 && snakeDir !== "LEFT") snakeDir = "RIGHT"; // Swipe Right
+        else if (diffX < 0 && snakeDir !== "RIGHT") snakeDir = "LEFT"; // Swipe Left
+    } else if (Math.abs(diffY) > swipeThreshold) {
+        if (diffY > 0 && snakeDir !== "UP") snakeDir = "DOWN"; // Swipe Down
+        else if (diffY < 0 && snakeDir !== "DOWN") snakeDir = "UP"; // Swipe Up
+    }
+}
+
 
 function draw() {
     if (gameState === "MENU") {
@@ -163,8 +196,9 @@ function keyPressed() {
     if (keyCode === LEFT_ARROW && snakeDir !== "RIGHT") snakeDir = "LEFT";
     if (keyCode === RIGHT_ARROW && snakeDir !== "LEFT") snakeDir = "RIGHT";
     if (key === "R" || key === "r") resetGame();
-    if (key === "M" || key === "m") gameState = "MENU"; // Return to main menu
+    if (key === "M" || key === "m") gameState = "MENU"; // חזרה לתפריט
 }
+
 
 function mousePressed() {
     if (gameState === "MENU") {

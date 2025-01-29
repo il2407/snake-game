@@ -1,0 +1,33 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: black;
+    margin: 0;
+}
+
+canvas {
+    border: 5px solid white;
+}
+
+button {
+    width: 120px;
+    height: 40px;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    margin: 10px;
+}
+
+#start-button {
+    background-color: green;
+    color: white;
+}
+
+#exit-button {
+    background-color: red;
+    color: white;
+}
