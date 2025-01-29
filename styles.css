@@ -4,33 +4,35 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #0f172a;
+    background: radial-gradient(circle, #0a192f 40%, #020c1b 100%);
     font-family: 'Press Start 2P', cursive;
     color: white;
     overflow: hidden;
 }
 
 canvas {
-    border: 5px solid #fff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    border: 5px solid #00ff99;
+    border-radius: 15px;
+    box-shadow: 0px 8px 20px rgba(0, 255, 153, 0.6);
 }
 
-/* עיצוב כפתורים */
+/* General Button Styling */
 button {
-    background-color: #00ff99;
+    background: linear-gradient(135deg, #00ff99, #00cc77);
     color: black;
-    font-size: 16px;
-    padding: 12px 20px;
+    font-size: 18px;
+    padding: 14px 24px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 15px;
     font-family: 'Press Start 2P', cursive;
-    transition: 0.3s ease;
+    transition: 0.3s ease-in-out;
+    box-shadow: 0px 4px 10px rgba(0, 255, 153, 0.4);
 }
 
 button:hover {
-    background-color: #00cc77;
-    transform: scale(1.05);
+    background: linear-gradient(135deg, #00cc77, #009966);
+    transform: scale(1.08);
+    box-shadow: 0px 6px 12px rgba(0, 255, 153, 0.7);
 }

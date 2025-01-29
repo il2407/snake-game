@@ -83,17 +83,18 @@ function preload() {
 }
 
 
+let fadeOpacity = 0;
+
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(30);
 
-    document.addEventListener("touchstart", (event) => {
-        event.preventDefault();
-        handleTouchClick(event);
-    }, { passive: false });
-
-    document.addEventListener("click", handleTouchClick, false);
+    let fadeInInterval = setInterval(() => {
+        fadeOpacity += 10;
+        if (fadeOpacity >= 255) clearInterval(fadeInInterval);
+    }, 50);
 }
+
 
 function handleTouchClick(event) {
     let x = event.clientX || event.touches?.[0]?.clientX;
@@ -169,27 +170,35 @@ function draw() {
 
 function drawMenu() {
     background(15, 23, 42);
+    fill(255, fadeOpacity);
     textAlign(CENTER, CENTER);
-
-    let sectionHeight = height / 3; // כל חלק תופס שליש מהמסך
-    let imageSize = width * 0.15; // גודל התמונות
-
-    /** 🔹 חלק 1: YOU + תמונות הנחש **/
-    fill(255);
     textSize(width * 0.07);
-    text("YOU", width / 2, sectionHeight * 0.25);
 
-    // הצגת ראש הנחש וגוף הנחש מתחת לטקסט
+    let sectionHeight = height / 3;
+    let imageSize = width * 0.15;
+
+    // === Title ===
+    fill(0, 255, 153);
+    textSize(width * 0.07);
+    text("Sankeya & Ido", width / 2, sectionHeight * 0.15);
+
+    // === Animated Glowing Effect ===
+    let glow = sin(frameCount * 0.1) * 50 + 150;
+    fill(0, glow, 153, 200);
+    textSize(width * 0.05);
+    text("YOU", width / 2, sectionHeight * 0.3);
+
+    // === Snake Preview ===
     image(snakeHeadImage, width / 2 - imageSize - 10, sectionHeight * 0.4, imageSize, imageSize);
     image(snakeBodyImages[1], width / 2 + 10, sectionHeight * 0.4, imageSize, imageSize);
 
-    /** 🔹 חלק 2: FOOD + תמונות האוכל **/
-    fill(255);
-    text("FOOD", width / 2, sectionHeight + sectionHeight * 0.25);
-
-    let foodStartY = sectionHeight + sectionHeight * 0.4;
+    // === Food Icons Preview ===
     let cols = 4;
     let spacing = width * 0.18;
+    let foodStartY = sectionHeight + sectionHeight * 0.4;
+
+
+        text("FOOD", width / 2, sectionHeight * 1.10);
 
     for (let i = 0; i < ghostImages.length; i++) {
         let x = (i % cols) * spacing + (width / 2 - ((cols - 1) * spacing) / 2);
@@ -197,18 +206,17 @@ function drawMenu() {
         image(ghostImages[i], x, y, imageSize, imageSize);
     }
 
-    /** 🔹 חלק 3: כפתור SURVIVE! (בגודל זהה לשאר החלקים) **/
-  let btnWidth = width * 0.6;
-  let btnHeight = height * 0.1;
-  let btnX = width / 2 - btnWidth / 2;
-  let btnY = height * 0.7;
+    // === Start Button with Glow ===
+    let btnWidth = width * 0.6;
+    let btnHeight = height * 0.1;
+    let btnX = width / 2 - btnWidth / 2;
+    let btnY = height * 0.8;
 
-  fill(0, 255, 153);
-  rect(btnX, btnY, btnWidth, btnHeight, 15);
-  fill(0);
-  textSize(width * 0.07);
-  textAlign(CENTER, CENTER);
-  text("SURVIVE!", width/2, btnY + btnHeight/2);
+    fill(0, 255, 153);
+    rect(btnX, btnY, btnWidth, btnHeight, 15);
+    fill(0);
+    textSize(width * 0.07);
+    text("SURVIVE", width / 2, btnY + btnHeight / 2);
 }
 
 
@@ -217,15 +225,17 @@ function drawWinScreen() {
     textAlign(CENTER, CENTER);
     fill(255);
 
-    // === 1) Headline - Same as Level 1 End Screen ===
+    // === Title with Animated Glow ===
+    let glow = sin(frameCount * 0.1) * 80 + 175;
+    fill(0, glow, 255, 255);
     textSize(width * 0.07);
-    text(`You survived 2 years!`, width / 2, height * 0.2);
+    text(`You survived 2 years!`, width / 2, height * 0.15);
 
-    // === 2) Centered Video - Same as Level 1 End Screen ===
-    let vidWidth = width * 0.8;  // 80% of screen width
-    let vidHeight = vidWidth * 9 / 16;  // Maintain 16:9 aspect ratio
+    // === Video Centered ===
+    let vidWidth = width * 0.8;
+    let vidHeight = vidWidth * 9 / 16;
     let vidX = (width - vidWidth) / 2;
-    let vidY = height * 0.3;  // Position below title
+    let vidY = height * 0.3;
 
     if (!videoWinPlaying) {
         videoWin.position(vidX, vidY);
@@ -235,11 +245,11 @@ function drawWinScreen() {
         videoWinPlaying = true;
     }
 
-    // === 3) Centered Continue Button - Same as Level 1 End Screen ===
+    // === Glowing Continue Button ===
     let btnWidth = width * 0.6;
     let btnHeight = height * 0.08;
     let btnX = (width - btnWidth) / 2;
-    let btnY = height * 0.75;  // Same position as Level 1 End Screen
+    let btnY = height * 0.75;
 
     fill(0, 255, 0);
     rect(btnX, btnY, btnWidth, btnHeight, 15);
