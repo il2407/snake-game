@@ -3,6 +3,7 @@ let snake = [];
 let snakeDir = "RIGHT";
 let touchStartX = 0;
 let touchStartY = 0;
+let videoWin; // משתנה לסרטון הניצחון
 let touchEndX = 0;
 let touchEndY = 0;
 let swipeThreshold = 30; // מרחק מינימלי לסווייפ
@@ -24,10 +25,16 @@ let height = window.innerHeight * 0.9; // 90% מגובה המסך
 
 
 
+let snakeBodyImages = [];
+
 function preload() {
     snakeHeadImage = loadImage("assets/face.png");
     backgroundImage = loadImage("assets/background.png");
     winImage = loadImage("assets/win_image.png");
+
+    // טען את הסרטון
+    videoWin = createVideo("assets/win_video.mp4");
+    videoWin.hide(); // מחביאים את הסרטון עד לסיום המשחק
 
     ghostImages = [
         loadImage("assets/miso.png"),
@@ -38,6 +45,11 @@ function preload() {
         loadImage("assets/floor.png"),
         loadImage("assets/rest.png"),
         loadImage("assets/tavor.png")
+    ];
+
+    snakeBodyImages = [
+        loadImage("assets/snake_body1.png"),
+        loadImage("assets/snake_body2.png")
     ];
 
     for (let i = 1; i <= 1123; i++) {
@@ -135,7 +147,12 @@ function drawMenu() {
     textSize(width * 0.07);
     fill(255);
     text("YOU:", width / 2, height * 0.15);
-    image(snakeHeadImage, width / 2 - 40, height * 0.18, 80, 80);
+
+    // הצגת תמונת ראש הנחש
+    image(snakeHeadImage, width / 2 - 60, height * 0.18, 80, 80);
+
+    // הצגת תמונת גוף ליד הראש (עם מרווח קטן)
+    image(snakeBodyImages[1], width / 2 + 10, height * 0.18, 80, 80);
 
     text("FOOD:", width / 2, height * 0.3);
 
@@ -186,12 +203,29 @@ function drawLevelTransition() {
 function drawWinScreen() {
     background(0);
     textAlign(CENTER, CENTER);
-    textSize(32);
+    textSize(width * 0.07);
     fill(255);
-    text("You survived 2 years!", width / 2, height / 2 - 20);
+    text("You survived 2 years!", width / 2, height * 0.2);
 
-    textSize(20);
-    text("Congratulations!", width / 2, height / 2 + 20);
+    // אם הסרטון עדיין לא מתנגן, ננגן אותו
+    if (!videoWin.elt.playing) {
+        videoWin.position(width * 0.1, height * 0.3);
+        videoWin.size(width * 0.8, height * 0.4);
+        videoWin.show();
+        videoWin.play();
+    }
+
+    // כפתור לחזור לתפריט הראשי
+    let btnWidth = width * 0.6;
+    let btnHeight = height * 0.08;
+    let btnX = width / 2 - btnWidth / 2;
+    let btnY = height * 0.75;
+
+    fill(0, 255, 0);
+    rect(btnX, btnY, btnWidth, btnHeight, 15);
+    fill(0);
+    textSize(width * 0.05);
+    text("Back to Menu", width / 2, btnY + btnHeight / 2);
 }
 
 
@@ -238,6 +272,7 @@ function drawGameOver() {
     textSize(width * 0.05);
     text("Restart", width / 2, btnY + btnHeight / 2);
 }
+
 
 
 function moveSnake() {
@@ -389,18 +424,18 @@ function randomGhostPosition() {
 }
 
 function drawSnake() {
-    let colors = [
-        color(0, 255, 0),
-        color(0, 200, 50),
-        color(0, 180, 100),
-    ];
-
     for (let i = 0; i < snake.length; i++) {
-        fill(colors[i % colors.length]);
-        rect(snake[i][0], snake[i][1], cellSize, cellSize, 5);
+        if (i === 0) {
+            // הראש תמיד יישאר עם תמונת הפנים
+            image(snakeHeadImage, snake[i][0], snake[i][1], cellSize, cellSize);
+        } else {
+            // הצגת הגוף עם שתי תמונות מתחלפות לסירוגין
+            let bodyImage = snakeBodyImages[i % 2];
+            image(bodyImage, snake[i][0], snake[i][1], cellSize, cellSize);
+        }
     }
-
 }
+
 
 function drawScore() {
     let padding = width * 0.03; // מרווח מהקצה
