@@ -43,14 +43,34 @@ function preload() {
     }
 }
 
+
 function setup() {
     createCanvas(width, height);
     frameRate(8);
 
-    // מאזינים לסווייפ במסך מגע
-    document.addEventListener("touchstart", handleTouchStart, false);
-    document.addEventListener("touchend", handleTouchEnd, false);
+    document.addEventListener("touchstart", (event) => {
+        event.preventDefault();
+        handleTouchClick(event);
+    }, { passive: false });
+
+    document.addEventListener("click", handleTouchClick, false);
 }
+
+function handleTouchClick(event) {
+    let x = event.clientX || event.touches?.[0]?.clientX;
+    let y = event.clientY || event.touches?.[0]?.clientY;
+
+    if (x > width * 0.66 && snakeDir !== "LEFT") {
+        snakeDir = "RIGHT"; // לחיצה בצד ימין → נחש הולך ימינה
+    } else if (x < width * 0.33 && snakeDir !== "RIGHT") {
+        snakeDir = "LEFT"; // לחיצה בצד שמאל → נחש הולך שמאלה
+    } else if (y < height * 0.33 && snakeDir !== "DOWN") {
+        snakeDir = "UP"; // לחיצה בחלק העליון → נחש הולך למעלה
+    } else if (y > height * 0.66 && snakeDir !== "UP") {
+        snakeDir = "DOWN"; // לחיצה בחלק התחתון → נחש הולך למטה
+    }
+}
+
 
 // פונקציה לזיהוי תחילת מגע
 function handleTouchStart(event) {
@@ -104,25 +124,33 @@ function drawMenu() {
     textAlign(CENTER, CENTER);
     textSize(32);
     fill(255);
-    text("Welcome to the Game!", width / 2, height / 8);
+    text("you:", width / 2, height / 6);
 
-    // Displaying the objects in a well-positioned grid
-    let rows = ceil(ghostImages.length / 4);
-    let startY = height / 5;
+    // הצגת תמונת ראש הנחש
+    image(snakeHeadImage, width / 2 - 20, height / 6 + 20, 40, 40);
+
+    // טקסט "food:"
+    text("food:", width / 2, height / 3);
+
+    // הצגת תמונות האוכל (מסודרות בשורות)
+    let startY = height / 3 + 30;
+    let cols = 4; // מספר עמודות בשורה
+    let spacing = 60; // ריווח בין התמונות
+
     for (let i = 0; i < ghostImages.length; i++) {
-        let x = (i % 4) * 60 + 70;
-        let y = floor(i / 4) * 60 + startY;
+        let x = (i % cols) * spacing + (width / 2 - ((cols - 1) * spacing) / 2);
+        let y = startY + floor(i / cols) * spacing;
         image(ghostImages[i], x, y, 40, 40);
     }
 
-    // "Start Game" button
+    // כפתור "survive" להתחלת המשחק
     fill(0, 255, 0);
     rect(width / 2 - 60, height - 150, 120, 40);
     fill(0);
     textSize(20);
-    text("Start Game", width / 2, height - 130);
+    text("survive", width / 2, height - 130);
 
-    // "Exit" button
+    // כפתור "Exit" ליציאה
     fill(255, 0, 0);
     rect(width / 2 - 60, height - 90, 120, 40);
     fill(0);
