@@ -12,7 +12,7 @@ let ghostImage;
 let gameOver = false;
 let gameState = "MENU"; // מצבים: MENU, PLAYING, LEVEL_TRANSITION, GAME_OVER
 let level = 1;
-let score = 11;
+let score = 1;
 let maxScorePerLevel = 12;
 let totalLevels = 2;
 let videoWinPlaying = false;
@@ -210,7 +210,8 @@ function drawMenu() {
     let btnWidth = width * 0.6;
     let btnHeight = height * 0.1;
     let btnX = width / 2 - btnWidth / 2;
-    let btnY = height * 0.8;
+    let btnY = height * 0.72
+   ;
 
     fill(0, 255, 153);
     rect(btnX, btnY, btnWidth, btnHeight, 15);
@@ -479,7 +480,7 @@ if (gameState === "LEVEL_TRANSITION") {
 function resetGame() {
     snake = [[100, 50], [90, 50], [80, 50]];
     snakeDir = "RIGHT";
-    score = 11;
+    score = 1;
     gameOver = false;
 
     // ווידוא שהמשחק נטען לשלב 2 ולא מוחק את זה
