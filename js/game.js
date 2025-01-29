@@ -11,7 +11,7 @@ let ghostPos;
 let ghostImage;
 let gameOver = false;
 let gameState = "MENU"; // מצבים: MENU, PLAYING, LEVEL_TRANSITION, GAME_OVER
-let level = 1;
+let level = 2;
 let score = 0;
 let maxScorePerLevel = 12;
 let totalLevels = 2;
@@ -34,16 +34,20 @@ function preload() {
     backgroundImage = loadImage("assets/background.png");
     winImage = loadImage("assets/win_image.png");
 
-    // טען את הסרטון
+    // Load videos and mute them for mobile autoplay
     videoWin = createVideo("assets/win_video.mp4");
-    videoWin.hide(); // מחביאים את הסרטון עד לסיום המשחק
+    videoWin.hide();
+    videoWin.volume(0); // Mute video to allow autoplay on mobile
 
-        videoLevel1 = createVideo("assets/win_video2.mp4");
-        videoLevel1.hide(); // מחביאים את הסרטון של סוף שלב 1
+    videoLevel1 = createVideo("assets/win_video2.mp4");
+    videoLevel1.hide();
+    videoLevel1.volume(0); // Mute video
 
-            videoLose = createVideo("assets/lose_video.mp4");
-            videoLose.hide(); // מחביאים את הסרטון של הפסד
+    videoLose = createVideo("assets/lose_video.mp4");
+    videoLose.hide();
+    videoLose.volume(0); // Mute video
 
+    // Load other assets
     ghostImages = [
         loadImage("assets/miso.png"),
         loadImage("assets/mold.png"),
@@ -204,26 +208,22 @@ function drawWinScreen() {
     fill(255);
     text("You survived 2 years!", width / 2, height * 0.2);
 
-    if (videoWin) {
-        videoWin.position(width * 0.1, height * 0.3);
-        videoWin.size(width * 0.8, height * 0.4);
-        videoWin.show();
-        videoWin.play();
-    } else {
-        console.error("Error: win video not loaded");
-    }
+    // Ensure the video starts only after user interaction
+    videoWin.position(width * 0.1, height * 0.3);
+    videoWin.size(width * 0.8, height * 0.4);
+    videoWin.show();
 
-    // כפתור לחזרה לתפריט הראשי
+    // Add play button for mobile users
     let btnWidth = width * 0.6;
     let btnHeight = height * 0.08;
     let btnX = width / 2 - btnWidth / 2;
-    let btnY = height * 0.75;
+    let btnY = height * 0.5;
 
     fill(0, 255, 0);
     rect(btnX, btnY, btnWidth, btnHeight, 15);
     fill(0);
     textSize(width * 0.05);
-    text("Back to Menu", width / 2, btnY + btnHeight / 2);
+    text("Play Video", width / 2, btnY + btnHeight / 2);
 }
 
 
@@ -368,19 +368,19 @@ function keyPressed() {
 
 
 function mousePressed() {
-if (gameState === "WIN_SCREEN") {
-    let btnWidth = width * 0.6;
-    let btnHeight = height * 0.08;
-    let btnX = width / 2 - btnWidth / 2;
-    let btnY = height * 0.75;
+    if (gameState === "WIN_SCREEN") {
+        let btnWidth = width * 0.6;
+        let btnHeight = height * 0.08;
+        let btnX = width / 2 - btnWidth / 2;
+        let btnY = height * 0.5;
 
-    if (mouseX > btnX && mouseX < btnX + btnWidth &&
-        mouseY > btnY && mouseY < btnY + btnHeight) {
-        videoWin.stop();
-        videoWin.hide();
-        gameState = "MENU";
+        if (mouseX > btnX && mouseX < btnX + btnWidth &&
+            mouseY > btnY && mouseY < btnY + btnHeight) {
+            videoWin.play();
+        }
     }
-}
+
+
 
 
     if (gameState === "MENU") {
