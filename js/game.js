@@ -12,7 +12,7 @@ let ghostImage;
 let gameOver = false;
 let gameState = "MENU"; // מצבים: MENU, PLAYING, LEVEL_TRANSITION, GAME_OVER
 let level = 1;
-let score = 0;
+let score = 11;
 let maxScorePerLevel = 12;
 let totalLevels = 2;
 let collectedItems = []; // List of eaten items
@@ -245,6 +245,7 @@ function drawLevelTransition() {
     fill(255);
     textSize(width * 0.07);
     text(`You survived 1 year!`, width / 2, height * 0.2);
+  videoLevel1Playing = false;
 
     // הצגת הסרטון רק אם לא מוצג עדיין
   if (!videoLevel1Playing) {
@@ -458,7 +459,7 @@ if (gameState === "LEVEL_TRANSITION") {
 function resetGame() {
     snake = [[100, 50], [90, 50], [80, 50]];
     snakeDir = "RIGHT";
-    score = 0;
+    score = 11;
     gameOver = false;
 
     // ווידוא שהמשחק נטען לשלב 2 ולא מוחק את זה
