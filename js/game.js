@@ -11,7 +11,7 @@ let ghostPos;
 let ghostImage;
 let gameOver = false;
 let gameState = "MENU"; // מצבים: MENU, PLAYING, LEVEL_TRANSITION, GAME_OVER
-let level = 2;
+let level = 1;
 let score = 0;
 let maxScorePerLevel = 12;
 let totalLevels = 2;
@@ -43,15 +43,15 @@ function preload() {
     // Load videos and mute them
     videoWin = createVideo("assets/win_video.mp4", onCanPlay);
     videoWin.hide();
-    videoWin.volume(0); // Mute to allow autoplay
+    videoWin.volume(1); // Mute to allow autoplay
 
     videoLevel1 = createVideo("assets/win_video2.mp4", onCanPlay);
     videoLevel1.hide();
-    videoLevel1.volume(0);
+    videoLevel1.volume(1);
 
     videoLose = createVideo("assets/lose_video.mp4", onCanPlay);
     videoLose.hide();
-    videoLose.volume(0);
+    videoLose.volume(1);
 
     // Load other assets
     ghostImages = [
